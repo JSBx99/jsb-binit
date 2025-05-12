@@ -39,7 +39,7 @@ namespace jsb_binit
 
 		private void tvMain_AfterSelect(object sender, TreeViewEventArgs e)
 		{
-			GetFileData(tvMain.SelectedNode);
+			//GetFileData(tvMain.SelectedNode);
 		}
 
 		private void GetFileData(TreeNode tn)
@@ -54,11 +54,43 @@ namespace jsb_binit
 		}
 
 		private void CompileDirectory()
-		{		
+		{
+			//Byte arrays for building .bin file
+			byte[] fHeader = Encoding.ASCII.GetBytes("JSB BN01");	//File header data
+			byte[] currentFileName;		//File name
+			byte[] fileNameLength;		//File name length
+			byte[] currentFileData;		//File data
+			byte[] fileDataSize;        //File data length
+
+			//Write file header data BEFORE adding the files themselves
+			using (var fStreamH = new FileStream(outputDir + outputFileName, FileMode.Append))
+			{
+				fStreamH.Write(fHeader, 0, 8);
+			}
+
 			foreach (TreeNode tn in tvMain.Nodes)
 			{
-				byte[] currentFileData = File.ReadAllBytes(inputDir + "\\" + tn.Text);
-				File.WriteAllBytes(outputDir + outputFileName, currentFileData);
+				//Get file name
+				string fname = tn.Text;
+				currentFileName = System.Text.Encoding.Unicode.GetBytes(fname);
+				int fnamelength = currentFileName.Length;
+				fileNameLength = BitConverter.GetBytes(fnamelength);
+				
+				//Get file data
+				currentFileData = File.ReadAllBytes(inputDir + "\\" + tn.Text);  //File data byte array
+				int fileDataLength = currentFileData.Length;                            //File data length
+				fileDataSize = BitConverter.GetBytes(fileDataLength);
+
+				using (var fStream = new FileStream(outputDir + outputFileName, FileMode.Append)) 
+				{
+					fStream.Write(fileNameLength,0,4);
+					fStream.Write(currentFileName,0,fnamelength);
+					fStream.Write(fileDataSize, 0, 4);	//Write file data length
+					fStream.Write(currentFileData, 0, fileDataLength);	//Write file data
+				}
+
+					//File.WriteAllBytes(outputDir + outputFileName, fileDataSize);
+				//File.WriteAllBytes(outputDir + outputFileName, currentFileData);	//Write file data
 			}
 		}
 	}

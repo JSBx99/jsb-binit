@@ -20,20 +20,40 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+		#region Windows Form Designer generated code
 
-        /// <summary>
-        ///  Required method for Designer support - do not modify
-        ///  the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
-        }
+		/// <summary>
+		///  Required method for Designer support - do not modify
+		///  the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent()
+		{
+			btnTest = new Button();
+			SuspendLayout();
+			// 
+			// btnTest
+			// 
+			btnTest.Location = new Point(223, 133);
+			btnTest.Name = "btnTest";
+			btnTest.Size = new Size(176, 75);
+			btnTest.TabIndex = 0;
+			btnTest.Text = "Click Me!";
+			btnTest.UseVisualStyleBackColor = true;
+			btnTest.Click += btnTest_Click;
+			// 
+			// frmMain
+			// 
+			AutoScaleDimensions = new SizeF(7F, 15F);
+			AutoScaleMode = AutoScaleMode.Font;
+			ClientSize = new Size(800, 450);
+			Controls.Add(btnTest);
+			Name = "frmMain";
+			Text = "Form1";
+			ResumeLayout(false);
+		}
 
-        #endregion
-    }
+		#endregion
+
+		private Button btnTest;
+	}
 }

@@ -106,13 +106,13 @@ namespace jsb_binit
 		{
 			byte[] bnHead = new byte[8];    //Header
 			byte[] bnVersion = new byte[4];     //JSB Binary Version - this program is designed to read 'BN01' version binaries
-			byte[] bnFileCount = new byte[4];	//File count for this binary
+			byte[] bnFileCount = new byte[4];   //File count for this binary
 
 			using (FileStream fstream = new FileStream("D:\\Data\\binit\\binit.bin", FileMode.Open))
 			{
-				fstream.Read(bnHead,0,8);
-				tvBin.Nodes[0].Nodes.Add(Encoding.ASCII.GetString(bnHead));		//Read header
-				
+				fstream.Read(bnHead, 0, 8);
+				tvBin.Nodes[0].Nodes.Add(Encoding.ASCII.GetString(bnHead));     //Read header
+
 				tvBin.ExpandAll();
 			}
 		}
@@ -121,6 +121,12 @@ namespace jsb_binit
 		{
 			tvMain.Nodes.Clear();
 			tvMain.Nodes.Add("D:\\Data\\binit\\input");
+		}
+
+		private void UpdateDirectoryTree(string dir) 
+		{
+			tvMain.Nodes.Clear();
+			tvMain.Nodes.Add(dir);
 		}
 
 		private void InitBINTree()
@@ -149,6 +155,22 @@ namespace jsb_binit
 		private void btnDecompile_Click(object sender, EventArgs e)
 		{
 			PopulateBINTree();
+		}
+
+		private void SelectInputDirectory() 
+		{
+			using (var fbd = new FolderBrowserDialog())
+			{
+				DialogResult fbresult = fbd.ShowDialog();
+				inputDir = new DirectoryInfo(fbd.SelectedPath);
+				UpdateDirectoryTree(fbd.SelectedPath);
+				DisplayInputFiles();
+			}	
+		}
+
+		private void chooseDirectoryToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SelectInputDirectory();
 		}
 	}
 

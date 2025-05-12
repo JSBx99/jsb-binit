@@ -44,6 +44,8 @@
 			btnDecompile = new Button();
 			btnCompile = new Button();
 			txtName = new TextBox();
+			ofd = new OpenFileDialog();
+			fbd = new FolderBrowserDialog();
 			msMain.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)splitMain).BeginInit();
 			splitMain.Panel1.SuspendLayout();
@@ -88,6 +90,7 @@
 			chooseDirectoryToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.O;
 			chooseDirectoryToolStripMenuItem.Size = new Size(239, 22);
 			chooseDirectoryToolStripMenuItem.Text = "Choose Input Directory";
+			chooseDirectoryToolStripMenuItem.Click += chooseDirectoryToolStripMenuItem_Click;
 			// 
 			// toolStripMenuItem1
 			// 
@@ -199,6 +202,10 @@
 			txtName.Size = new Size(92, 23);
 			txtName.TabIndex = 3;
 			// 
+			// ofd
+			// 
+			ofd.FileName = "openFileDialog1";
+			// 
 			// frmMain
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
@@ -243,5 +250,7 @@
 		private SplitContainer splitContainer1;
 		private TreeView tvBin;
 		private Button btnDecompile;
+		private OpenFileDialog ofd;
+		private FolderBrowserDialog fbd;
 	}
 }

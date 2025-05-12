@@ -33,6 +33,8 @@
 			fileToolStripMenuItem = new ToolStripMenuItem();
 			tvMain = new TreeView();
 			splitMain = new SplitContainer();
+			txtData = new TextBox();
+			btnCompile = new Button();
 			msMain.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)splitMain).BeginInit();
 			splitMain.Panel1.SuspendLayout();
@@ -42,7 +44,7 @@
 			// 
 			// btnTest
 			// 
-			btnTest.Location = new Point(120, 170);
+			btnTest.Location = new Point(78, 306);
 			btnTest.Name = "btnTest";
 			btnTest.Size = new Size(176, 75);
 			btnTest.TabIndex = 0;
@@ -72,6 +74,7 @@
 			tvMain.Name = "tvMain";
 			tvMain.Size = new Size(269, 445);
 			tvMain.TabIndex = 2;
+			tvMain.AfterSelect += tvMain_AfterSelect;
 			// 
 			// splitMain
 			// 
@@ -86,10 +89,30 @@
 			// 
 			// splitMain.Panel2
 			// 
+			splitMain.Panel2.Controls.Add(btnCompile);
+			splitMain.Panel2.Controls.Add(txtData);
 			splitMain.Panel2.Controls.Add(btnTest);
 			splitMain.Size = new Size(824, 449);
 			splitMain.SplitterDistance = 273;
 			splitMain.TabIndex = 3;
+			// 
+			// txtData
+			// 
+			txtData.Location = new Point(3, 3);
+			txtData.Multiline = true;
+			txtData.Name = "txtData";
+			txtData.Size = new Size(284, 194);
+			txtData.TabIndex = 1;
+			// 
+			// btnCompile
+			// 
+			btnCompile.Location = new Point(307, 248);
+			btnCompile.Name = "btnCompile";
+			btnCompile.Size = new Size(120, 51);
+			btnCompile.TabIndex = 2;
+			btnCompile.Text = "Compile";
+			btnCompile.UseVisualStyleBackColor = true;
+			btnCompile.Click += btnCompile_Click;
 			// 
 			// frmMain
 			// 
@@ -105,6 +128,7 @@
 			msMain.PerformLayout();
 			splitMain.Panel1.ResumeLayout(false);
 			splitMain.Panel2.ResumeLayout(false);
+			splitMain.Panel2.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)splitMain).EndInit();
 			splitMain.ResumeLayout(false);
 			ResumeLayout(false);
@@ -118,5 +142,7 @@
 		private ToolStripMenuItem fileToolStripMenuItem;
 		private TreeView tvMain;
 		private SplitContainer splitMain;
+		private TextBox txtData;
+		private Button btnCompile;
 	}
 }

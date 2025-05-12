@@ -1,7 +1,13 @@
+using System.Text;
+
 namespace jsb_binit
 {
 	public partial class frmMain : Form
 	{
+		DirectoryInfo inputDir = new DirectoryInfo("D:\\Data\\binit\\input");
+		String outputDir = "D:\\Data\\binit\\";
+		String outputFileName = "binit.bin";
+
 		public frmMain()
 		{
 			InitializeComponent();
@@ -15,7 +21,7 @@ namespace jsb_binit
 
 		private void DisplayInputFiles()
 		{
-			DirectoryInfo inputDir = new DirectoryInfo("D:\\Data\\binit\\input");
+
 
 			foreach (FileInfo file in inputDir.GetFiles())
 			{
@@ -26,11 +32,36 @@ namespace jsb_binit
 			}
 		}
 
-		private void ClearTree() 
+		private void ClearTree()
 		{
 			tvMain.Nodes.Clear();
 		}
+
+		private void tvMain_AfterSelect(object sender, TreeViewEventArgs e)
+		{
+			GetFileData(tvMain.SelectedNode);
+		}
+
+		private void GetFileData(TreeNode tn)
+		{
+			byte[] currentFileData = File.ReadAllBytes(inputDir + "\\" + tn.Text);
+			txtData.Text = Encoding.ASCII.GetString(currentFileData);
+		}
+
+		private void btnCompile_Click(object sender, EventArgs e)
+		{
+			CompileDirectory();
+		}
+
+		private void CompileDirectory()
+		{		
+			foreach (TreeNode tn in tvMain.Nodes)
+			{
+				byte[] currentFileData = File.ReadAllBytes(inputDir + "\\" + tn.Text);
+				File.WriteAllBytes(outputDir + outputFileName, currentFileData);
+			}
+		}
 	}
 
-	
+
 }

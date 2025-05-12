@@ -1,4 +1,6 @@
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Windows.Forms;
 
 namespace jsb_binit
 {
@@ -6,7 +8,11 @@ namespace jsb_binit
 	{
 		DirectoryInfo inputDir = new DirectoryInfo("D:\\Data\\binit\\input");
 		String outputDir = "D:\\Data\\binit\\";
+		String decompDir = "D:\\Data\\binit\\bin\\";
 		String outputFileName = "binit.bin";
+
+		//Some vars
+		string fPath;
 
 		public frmMain()
 		{
@@ -96,22 +102,99 @@ namespace jsb_binit
 					fStream.Write(fileDataSize, 0, 4);  //Write file data length
 					fStream.Write(currentFileData, 0, fileDataLength);  //Write file data
 				}
-
-				//File.WriteAllBytes(outputDir + outputFileName, fileDataSize);
-				//File.WriteAllBytes(outputDir + outputFileName, currentFileData);	//Write file data
+				//Clear out garbage to free up memory
+				GC.Collect();
 			}
 		}
 
 		private void DecompileBIN()
 		{
-			byte[] bnHead = new byte[8];    //Header
+			byte[] bnHead = new byte[4];    //Header
 			byte[] bnVersion = new byte[4];     //JSB Binary Version - this program is designed to read 'BN01' version binaries
 			byte[] bnFileCount = new byte[4];   //File count for this binary
+			byte[] bnFileNameLength = new byte[4];  //File name length used for each file inside the bin
+			byte[] bnFileName = new byte[0];
+			byte[] bnFileDataLength = new byte[4];
+			byte[] bnFileData = new byte[0];
 
-			using (FileStream fstream = new FileStream("D:\\Data\\binit\\binit.bin", FileMode.Open))
+			using (var ofd = new OpenFileDialog())
 			{
-				fstream.Read(bnHead, 0, 8);
-				tvBin.Nodes[0].Nodes.Add(Encoding.ASCII.GetString(bnHead));     //Read header
+				if (ofd.ShowDialog() == DialogResult.OK)
+				{
+					fPath = ofd.FileName;
+				}
+			}
+
+			//Read bytes from the bin file using binary reader and file stream
+			using (BinaryReader breader = new BinaryReader(new FileStream(fPath, FileMode.Open)))
+			{
+				//Read first 4 bytes (JSB>)
+				breader.BaseStream.Seek(0, SeekOrigin.Begin);
+				breader.Read(bnHead, 0, 4);
+				//Convert bytes into string
+				string sbnHead = BitConverter.ToString(bnHead);
+				
+				//Read next 4 bytes (BNXX) where BN=Binary and XX=Binary version
+				breader.BaseStream.Seek(4,SeekOrigin.Begin);
+				breader.Read(bnVersion, 0, 4);
+				//Convert bytes to string
+				string sbnVersion = BitConverter.ToString(bnVersion);
+
+				//Read next 4 bytes (XX-XX-XX-XX) where XX-XX-XX-XX=Number of files in the bin
+				breader.BaseStream.Seek(8, SeekOrigin.Begin);
+				breader.Read(bnFileCount, 0, 4);
+				//Convert bytes to int
+				int ibnFileCount = BitConverter.ToInt32(bnFileCount);
+
+				//Some vars for the loop
+				int fileListOffset = 12;    //Offset where the header ends and the list of files starts
+				int getCurrentOffset = fileListOffset;
+				int fileNameLength = 0;
+				int fileDataLength = 0;
+
+				//Loop to unpack each file
+				for (int i = 0; i < ibnFileCount; i++)
+				{
+					//Get file name length
+					breader.BaseStream.Seek(getCurrentOffset, SeekOrigin.Begin);
+					breader.Read(bnFileNameLength, 0, 4);
+					fileNameLength = BitConverter.ToInt32(bnFileNameLength);
+					getCurrentOffset += 4;  //Move offset to read from to start of file name
+
+					//Read file name and store it as a string
+					breader.BaseStream.Seek(getCurrentOffset, SeekOrigin.Begin);
+					Array.Resize(ref bnFileName, fileNameLength);   //Resize file name array to be the correct length of the file name
+					breader.Read(bnFileName, 0, fileNameLength);
+					string sbnFileName = Encoding.ASCII.GetString(bnFileName);
+					getCurrentOffset += fileNameLength;
+
+					//Get file data length
+					breader.BaseStream.Seek(getCurrentOffset, SeekOrigin.Begin);
+					breader.Read(bnFileDataLength, 0, 4);
+					fileDataLength = BitConverter.ToInt32(bnFileDataLength);
+					getCurrentOffset += 4;  //Move offset to read from to start of file data
+
+					//Read file data
+					breader.BaseStream.Seek(getCurrentOffset, SeekOrigin.Begin);
+					Array.Resize(ref bnFileData, fileDataLength);   //Resize file data array to be the correct length of the file name
+					breader.Read(bnFileData, 0, fileDataLength);
+					getCurrentOffset += fileDataLength;
+
+					//Create the file in the output folder with its data
+					using (var fStream = new FileStream(decompDir + sbnFileName, FileMode.Create))
+					{
+						//Create data
+						fStream.Write(bnFileData, 0, fileDataLength);
+					}
+
+					//Add file to the treeview
+					tvBin.Nodes[0].Nodes.Add(sbnFileName);
+
+					
+				}
+
+				//Clear out garbage to free up memory
+				GC.Collect();
 
 				tvBin.ExpandAll();
 			}

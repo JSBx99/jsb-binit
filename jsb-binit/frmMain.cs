@@ -22,7 +22,12 @@ namespace jsb_binit
 		private void btnTest_Click(object sender, EventArgs e)
 		{
 			ClearTree();
-			DisplayInputFiles();
+			//DisplayInputFiles();
+
+			for (int i = 0; i < 100; i++)
+			{
+				tvMain.Nodes.Add("Node" + i);
+			}
 		}
 
 		private void DisplayInputFiles()
@@ -133,9 +138,9 @@ namespace jsb_binit
 				breader.Read(bnHead, 0, 4);
 				//Convert bytes into string
 				string sbnHead = BitConverter.ToString(bnHead);
-				
+
 				//Read next 4 bytes (BNXX) where BN=Binary and XX=Binary version
-				breader.BaseStream.Seek(4,SeekOrigin.Begin);
+				breader.BaseStream.Seek(4, SeekOrigin.Begin);
 				breader.Read(bnVersion, 0, 4);
 				//Convert bytes to string
 				string sbnVersion = BitConverter.ToString(bnVersion);
@@ -151,6 +156,9 @@ namespace jsb_binit
 				int getCurrentOffset = fileListOffset;
 				int fileNameLength = 0;
 				int fileDataLength = 0;
+
+				//Set progress bar max to the number of files in the bin
+				pbMain.Maximum = ibnFileCount;
 
 				//Loop to unpack each file
 				for (int i = 0; i < ibnFileCount; i++)
@@ -190,13 +198,23 @@ namespace jsb_binit
 					//Add file to the treeview
 					tvBin.Nodes[0].Nodes.Add(sbnFileName);
 
-					
+					//Update progress bar
+					pbMain.Value = i + 1;
+
+					//Update status textbox
+					txtStatus.Text = "Unpacking: " + sbnFileName + " (" + (i + 1) + "/" + ibnFileCount + ")";
 				}
 
 				//Clear out garbage to free up memory
 				GC.Collect();
 
 				tvBin.ExpandAll();
+
+				//Set progress bar back to 0
+				pbMain.Value = 0;
+
+				//Set status text to complete
+				txtStatus.Text = "Unpacking complete!";
 			}
 		}
 
@@ -206,7 +224,7 @@ namespace jsb_binit
 			tvMain.Nodes.Add("D:\\Data\\binit\\input");
 		}
 
-		private void UpdateDirectoryTree(string dir) 
+		private void UpdateDirectoryTree(string dir)
 		{
 			tvMain.Nodes.Clear();
 			tvMain.Nodes.Add(dir);
@@ -240,7 +258,7 @@ namespace jsb_binit
 			PopulateBINTree();
 		}
 
-		private void SelectInputDirectory() 
+		private void SelectInputDirectory()
 		{
 			using (var fbd = new FolderBrowserDialog())
 			{
@@ -248,12 +266,22 @@ namespace jsb_binit
 				inputDir = new DirectoryInfo(fbd.SelectedPath);
 				UpdateDirectoryTree(fbd.SelectedPath);
 				DisplayInputFiles();
-			}	
+			}
 		}
 
 		private void chooseDirectoryToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			SelectInputDirectory();
+		}
+
+		private void splitMain_Panel2_Paint(object sender, PaintEventArgs e)
+		{
+
+		}
+
+		private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+		{
+
 		}
 	}
 

@@ -48,10 +48,9 @@
 			txtInputDirectory = new TextBox();
 			tableLayoutPanel2 = new TableLayoutPanel();
 			tvBin = new TreeView();
-			btnOutput = new Button();
-			txtOutputDirectory = new TextBox();
+			btnUnload = new Button();
+			txtBINDirectory = new TextBox();
 			btnCompile = new Button();
-			btnOpenExisting = new Button();
 			btnDecompile = new Button();
 			txtStatus = new TextBox();
 			pbMain = new ProgressBar();
@@ -147,7 +146,6 @@
 			// splitMain.Panel2
 			// 
 			splitMain.Panel2.Controls.Add(btnCompile);
-			splitMain.Panel2.Controls.Add(btnOpenExisting);
 			splitMain.Panel2.Controls.Add(btnDecompile);
 			splitMain.Panel2.Controls.Add(txtStatus);
 			splitMain.Panel2.Controls.Add(pbMain);
@@ -201,6 +199,7 @@
 			btnChangeInput.TabIndex = 6;
 			btnChangeInput.Text = "Change Input Directory...";
 			btnChangeInput.UseVisualStyleBackColor = true;
+			btnChangeInput.Click += btnChangeInput_Click;
 			// 
 			// tvMain
 			// 
@@ -215,6 +214,7 @@
 			// txtInputDirectory
 			// 
 			txtInputDirectory.Dock = DockStyle.Fill;
+			txtInputDirectory.Enabled = false;
 			txtInputDirectory.Location = new Point(3, 418);
 			txtInputDirectory.Name = "txtInputDirectory";
 			txtInputDirectory.Size = new Size(229, 23);
@@ -226,8 +226,8 @@
 			tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70F));
 			tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
 			tableLayoutPanel2.Controls.Add(tvBin, 0, 0);
-			tableLayoutPanel2.Controls.Add(btnOutput, 1, 1);
-			tableLayoutPanel2.Controls.Add(txtOutputDirectory, 0, 1);
+			tableLayoutPanel2.Controls.Add(btnUnload, 1, 1);
+			tableLayoutPanel2.Controls.Add(txtBINDirectory, 0, 1);
 			tableLayoutPanel2.Dock = DockStyle.Fill;
 			tableLayoutPanel2.Location = new Point(0, 0);
 			tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -246,44 +246,36 @@
 			tvBin.Size = new Size(365, 409);
 			tvBin.TabIndex = 3;
 			// 
-			// btnOutput
+			// btnUnload
 			// 
-			btnOutput.Dock = DockStyle.Fill;
-			btnOutput.Location = new Point(262, 418);
-			btnOutput.Name = "btnOutput";
-			btnOutput.Size = new Size(106, 24);
-			btnOutput.TabIndex = 7;
-			btnOutput.Text = "Change Output Directory...";
-			btnOutput.UseVisualStyleBackColor = true;
+			btnUnload.Dock = DockStyle.Fill;
+			btnUnload.Location = new Point(262, 418);
+			btnUnload.Name = "btnUnload";
+			btnUnload.Size = new Size(106, 24);
+			btnUnload.TabIndex = 7;
+			btnUnload.Text = "Unload BIN";
+			btnUnload.UseVisualStyleBackColor = true;
+			btnUnload.Click += btnUnload_Click;
 			// 
-			// txtOutputDirectory
+			// txtBINDirectory
 			// 
-			txtOutputDirectory.Dock = DockStyle.Fill;
-			txtOutputDirectory.Location = new Point(3, 418);
-			txtOutputDirectory.Name = "txtOutputDirectory";
-			txtOutputDirectory.Size = new Size(253, 23);
-			txtOutputDirectory.TabIndex = 4;
+			txtBINDirectory.Dock = DockStyle.Fill;
+			txtBINDirectory.Enabled = false;
+			txtBINDirectory.Location = new Point(3, 418);
+			txtBINDirectory.Name = "txtBINDirectory";
+			txtBINDirectory.Size = new Size(253, 23);
+			txtBINDirectory.TabIndex = 4;
 			// 
 			// btnCompile
 			// 
 			btnCompile.Dock = DockStyle.Bottom;
-			btnCompile.Location = new Point(0, 175);
+			btnCompile.Location = new Point(0, 235);
 			btnCompile.Name = "btnCompile";
 			btnCompile.Size = new Size(97, 60);
 			btnCompile.TabIndex = 2;
 			btnCompile.Text = "Compile BIN From Input Folder";
 			btnCompile.UseVisualStyleBackColor = true;
 			btnCompile.Click += btnCompile_Click;
-			// 
-			// btnOpenExisting
-			// 
-			btnOpenExisting.Dock = DockStyle.Bottom;
-			btnOpenExisting.Location = new Point(0, 235);
-			btnOpenExisting.Name = "btnOpenExisting";
-			btnOpenExisting.Size = new Size(97, 60);
-			btnOpenExisting.TabIndex = 6;
-			btnOpenExisting.Text = "Open Existing BIN";
-			btnOpenExisting.UseVisualStyleBackColor = true;
 			// 
 			// btnDecompile
 			// 
@@ -322,6 +314,7 @@
 			btnTest.TabIndex = 0;
 			btnTest.Text = "Debug Button";
 			btnTest.UseVisualStyleBackColor = true;
+			btnTest.Visible = false;
 			btnTest.Click += btnTest_Click;
 			// 
 			// frmMain
@@ -374,14 +367,13 @@
 		private TextBox txtInputDirectory;
 		private TableLayoutPanel tableLayoutPanel2;
 		private TreeView tvBin;
-		private TextBox txtOutputDirectory;
+		private TextBox txtBINDirectory;
 		private Button btnChangeInput;
 		private Button btnCompile;
-		private Button btnOutput;
+		private Button btnUnload;
 		private Button btnDecompile;
 		private TextBox txtStatus;
 		private ProgressBar pbMain;
 		private Button btnTest;
-		private Button btnOpenExisting;
 	}
 }

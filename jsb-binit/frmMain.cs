@@ -1,3 +1,4 @@
+using jsb_binit.Properties;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Forms;
@@ -6,8 +7,9 @@ namespace jsb_binit
 {
 	public partial class frmMain : Form
 	{
-		DirectoryInfo inputDir = new DirectoryInfo("D:\\Data\\binit\\input");
-		String outputDir = "D:\\Data\\binit\\";
+		DirectoryInfo inputDir = new DirectoryInfo(Properties.Settings.Default.InputDirectory);
+		String UserInputDir;
+		String UserOutputDir;
 		String decompDir = "D:\\Data\\binit\\bin\\";
 		String outputFileName = "binit.bin";
 
@@ -75,17 +77,35 @@ namespace jsb_binit
 			byte[] currentFileData;     //File data
 			byte[] fileDataSize;        //File data length
 
+			//Use save file dialog to choose where to output bin file
+			using (SaveFileDialog sfd = new SaveFileDialog())
+			{
+				//Set dialog parameters
+				sfd.Filter = "Binary File|*.bin|JSB Version (BN01) Binary|*.bn1";
+
+				if (sfd.ShowDialog() == DialogResult.OK)
+				{
+					outputFileName = sfd.FileName;
+				}
+				else {
+					return;
+				}
+			}
+
 			//Write file header data BEFORE adding the files themselves
-			using (var fStreamH = new FileStream(outputDir + outputFileName, FileMode.Create))
+			using (var fStreamH = new FileStream(outputFileName, FileMode.Create))
 			{
 				fStreamH.Write(fHeader, 0, 8);
 			}
 
 			//Write file count
-			using (var fStreamH = new FileStream(outputDir + outputFileName, FileMode.Append))
+			using (var fStreamH = new FileStream(outputFileName, FileMode.Append))
 			{
 				fStreamH.Write(fFileCount, 0, 4);
 			}
+
+			//Load bin in the tree view
+			LoadBIN(outputFileName);
 
 			foreach (TreeNode tn in tvMain.Nodes[0].Nodes)
 			{
@@ -96,20 +116,25 @@ namespace jsb_binit
 				fileNameLength = BitConverter.GetBytes(fnamelength);
 
 				//Get file data
-				currentFileData = File.ReadAllBytes(inputDir + "\\" + tn.Text);  //File data byte array
+				currentFileData = File.ReadAllBytes(UserInputDir + "\\" + tn.Text);  //File data byte array
 				int fileDataLength = currentFileData.Length;                            //File data length
 				fileDataSize = BitConverter.GetBytes(fileDataLength);
 
-				using (var fStream = new FileStream(outputDir + outputFileName, FileMode.Append))
+				using (var fStream = new FileStream(outputFileName, FileMode.Append))
 				{
 					fStream.Write(fileNameLength, 0, 4);
 					fStream.Write(currentFileName, 0, fnamelength);
 					fStream.Write(fileDataSize, 0, 4);  //Write file data length
 					fStream.Write(currentFileData, 0, fileDataLength);  //Write file data
 				}
+
+				//Add a tree node to the bin tree view for this file
+				tvBin.Nodes[0].Nodes.Add(tn.Text);
+
 				//Clear out garbage to free up memory
 				GC.Collect();
 			}
+
 		}
 
 		private void DecompileBIN()
@@ -221,7 +246,7 @@ namespace jsb_binit
 		private void InitDirectoryTree()
 		{
 			tvMain.Nodes.Clear();
-			tvMain.Nodes.Add("D:\\Data\\binit\\input");
+			tvMain.Nodes.Add(Properties.Settings.Default.InputDirectory);
 		}
 
 		private void UpdateDirectoryTree(string dir)
@@ -251,6 +276,17 @@ namespace jsb_binit
 			InitDirectoryTree();
 			InitBINTree();
 			PopulateDirectoryTree();
+			LoadUserSettings();
+			UnloadBIN();
+		}
+
+		private void LoadUserSettings()
+		{
+			UserInputDir = Properties.Settings.Default.InputDirectory;
+			UserOutputDir = Properties.Settings.Default.OutputDirectory;
+
+			txtInputDirectory.Text = UserInputDir;
+			txtBINDirectory.Text = UserOutputDir;
 		}
 
 		private void btnDecompile_Click(object sender, EventArgs e)
@@ -282,6 +318,54 @@ namespace jsb_binit
 		private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
 		{
 
+		}
+
+		private void btnOpenExisting_Click(object sender, EventArgs e)
+		{
+
+		}
+
+		private void SetUserInputDirectory(string s)
+		{
+			Properties.Settings.Default.InputDirectory = s;
+			Properties.Settings.Default.Save();
+			LoadUserSettings();
+		}
+
+		private void btnChangeInput_Click(object sender, EventArgs e)
+		{
+			using (var fbd = new FolderBrowserDialog())
+			{
+				DialogResult fbresult = fbd.ShowDialog();
+				inputDir = new DirectoryInfo(fbd.SelectedPath);
+				UpdateDirectoryTree(fbd.SelectedPath);
+				txtInputDirectory.Text = fbd.SelectedPath;
+				SetUserInputDirectory(fbd.SelectedPath);
+				DisplayInputFiles();
+			}
+		}
+
+		private void btnUnload_Click(object sender, EventArgs e)
+		{
+			UnloadBIN();
+		}
+
+		private void UnloadBIN()
+		{
+			txtBINDirectory.Clear();
+			tvBin.Nodes.Clear();
+			//btnDecompile.Enabled = false;
+			btnUnload.Enabled = false;
+			btnCompile.Enabled = true;
+		}
+
+		private void LoadBIN(string s)
+		{
+			txtBINDirectory.Text = s;
+			tvBin.Nodes.Add(s);
+			//btnDecompile.Enabled = true;
+			btnUnload.Enabled = true;
+			btnCompile.Enabled = false;
 		}
 	}
 

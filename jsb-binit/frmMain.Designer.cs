@@ -97,6 +97,7 @@
 			chooseOutputDirectoryToolStripMenuItem.Name = "chooseOutputDirectoryToolStripMenuItem";
 			chooseOutputDirectoryToolStripMenuItem.Size = new Size(279, 22);
 			chooseOutputDirectoryToolStripMenuItem.Text = "Change Output Directory";
+			chooseOutputDirectoryToolStripMenuItem.Visible = false;
 			// 
 			// toolStripMenuItem1
 			// 
@@ -109,12 +110,14 @@
 			compileToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.S;
 			compileToolStripMenuItem.Size = new Size(279, 22);
 			compileToolStripMenuItem.Text = "Compile BIN From Input Folder";
+			compileToolStripMenuItem.Click += compileToolStripMenuItem_Click;
 			// 
 			// decompileToolStripMenuItem
 			// 
 			decompileToolStripMenuItem.Name = "decompileToolStripMenuItem";
 			decompileToolStripMenuItem.Size = new Size(279, 22);
 			decompileToolStripMenuItem.Text = "Unpack BIN To Folder...";
+			decompileToolStripMenuItem.Click += decompileToolStripMenuItem_Click;
 			// 
 			// toolStripMenuItem2
 			// 

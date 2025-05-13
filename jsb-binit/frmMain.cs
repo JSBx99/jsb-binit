@@ -87,7 +87,8 @@ namespace jsb_binit
 				{
 					outputFileName = sfd.FileName;
 				}
-				else {
+				else
+				{
 					return;
 				}
 			}
@@ -130,6 +131,7 @@ namespace jsb_binit
 
 				//Add a tree node to the bin tree view for this file
 				tvBin.Nodes[0].Nodes.Add(tn.Text);
+				tvBin.ExpandAll();
 
 				//Clear out garbage to free up memory
 				GC.Collect();
@@ -294,20 +296,23 @@ namespace jsb_binit
 			PopulateBINTree();
 		}
 
-		private void SelectInputDirectory()
+		private void chooseDirectoryToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			ChangeInputDirectory();
+		}
+
+		private void ChangeInputDirectory()
 		{
 			using (var fbd = new FolderBrowserDialog())
 			{
 				DialogResult fbresult = fbd.ShowDialog();
 				inputDir = new DirectoryInfo(fbd.SelectedPath);
 				UpdateDirectoryTree(fbd.SelectedPath);
+				txtInputDirectory.Text = fbd.SelectedPath;
+				SetUserInputDirectory(fbd.SelectedPath);
 				DisplayInputFiles();
+				btnCompile.Enabled = true;
 			}
-		}
-
-		private void chooseDirectoryToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SelectInputDirectory();
 		}
 
 		private void splitMain_Panel2_Paint(object sender, PaintEventArgs e)
@@ -334,15 +339,7 @@ namespace jsb_binit
 
 		private void btnChangeInput_Click(object sender, EventArgs e)
 		{
-			using (var fbd = new FolderBrowserDialog())
-			{
-				DialogResult fbresult = fbd.ShowDialog();
-				inputDir = new DirectoryInfo(fbd.SelectedPath);
-				UpdateDirectoryTree(fbd.SelectedPath);
-				txtInputDirectory.Text = fbd.SelectedPath;
-				SetUserInputDirectory(fbd.SelectedPath);
-				DisplayInputFiles();
-			}
+			ChangeInputDirectory();
 		}
 
 		private void btnUnload_Click(object sender, EventArgs e)
@@ -354,18 +351,28 @@ namespace jsb_binit
 		{
 			txtBINDirectory.Clear();
 			tvBin.Nodes.Clear();
-			//btnDecompile.Enabled = false;
 			btnUnload.Enabled = false;
 			btnCompile.Enabled = true;
+			compileToolStripMenuItem.Enabled = true;
 		}
 
 		private void LoadBIN(string s)
 		{
 			txtBINDirectory.Text = s;
 			tvBin.Nodes.Add(s);
-			//btnDecompile.Enabled = true;
 			btnUnload.Enabled = true;
 			btnCompile.Enabled = false;
+			compileToolStripMenuItem.Enabled = false;
+		}
+
+		private void compileToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			CompileDirectory();
+		}
+
+		private void decompileToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			PopulateBINTree();
 		}
 	}
 

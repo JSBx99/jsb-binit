@@ -155,6 +155,10 @@ namespace jsb_binit
 				{
 					fPath = ofd.FileName;
 				}
+				else
+				{
+					return;
+				}
 			}
 
 			//Read bytes from the bin file using binary reader and file stream
@@ -305,13 +309,20 @@ namespace jsb_binit
 		{
 			using (var fbd = new FolderBrowserDialog())
 			{
-				DialogResult fbresult = fbd.ShowDialog();
-				inputDir = new DirectoryInfo(fbd.SelectedPath);
-				UpdateDirectoryTree(fbd.SelectedPath);
-				txtInputDirectory.Text = fbd.SelectedPath;
-				SetUserInputDirectory(fbd.SelectedPath);
-				DisplayInputFiles();
-				btnCompile.Enabled = true;
+				if (fbd.ShowDialog() == DialogResult.OK)
+				{
+					DialogResult fbresult = fbd.ShowDialog();
+					inputDir = new DirectoryInfo(fbd.SelectedPath);
+					UpdateDirectoryTree(fbd.SelectedPath);
+					txtInputDirectory.Text = fbd.SelectedPath;
+					SetUserInputDirectory(fbd.SelectedPath);
+					DisplayInputFiles();
+					btnCompile.Enabled = true;
+				}
+				else
+				{
+					return;
+				}
 			}
 		}
 

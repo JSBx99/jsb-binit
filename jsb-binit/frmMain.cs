@@ -12,6 +12,7 @@ namespace jsb_binit
 		String UserOutputDir = "C:\\";
 		String decompDir = "C:\\";
 		String outputFileName = "untitled.bin";
+		bool IsBINLoaded = false;
 
 		//Some vars
 		string fPath = "C:\\";
@@ -41,6 +42,24 @@ namespace jsb_binit
 		private void btnUnload_Click(object sender, EventArgs e)
 		{
 			UnloadBIN();
+		}
+
+		private void btnLoad_Click(object sender, EventArgs e)
+		{
+			using (var ofd = new OpenFileDialog())
+			{
+				if (ofd.ShowDialog() == DialogResult.OK)
+				{
+					fPath = ofd.FileName;
+				}
+				else
+				{
+					return;
+				}
+			}
+
+			UnloadBIN();
+			LoadBIN(fPath);
 		}
 
 		//--- MENU BAR STUFF ---
@@ -152,7 +171,7 @@ namespace jsb_binit
 			{
 				if (fbd.ShowDialog() == DialogResult.OK)
 				{
-					decompDir = fbd.SelectedPath;
+					decompDir = fbd.SelectedPath + "\\";
 				}
 				else
 				{
@@ -220,6 +239,8 @@ namespace jsb_binit
 					breader.Read(bnFileData, 0, fileDataLength);
 					getCurrentOffset += fileDataLength;
 
+					System.Diagnostics.Debug.WriteLine(decompDir + sbnFileName);
+
 					//Create the file in the output folder with its data
 					using (var fStream = new FileStream(decompDir + sbnFileName, FileMode.Create))
 					{
@@ -244,6 +265,73 @@ namespace jsb_binit
 
 				//Set status text to complete
 				txtStatus.Text = "Unpacking complete!";
+			}
+		}
+
+		private void GetBINFileNames(string filePath)
+		{
+			byte[] bnFileCount = new byte[4];   //File count for this binary
+			byte[] bnFileNameLength = new byte[4];  //File name length used for each file inside the bin
+			byte[] bnFileName = new byte[0];
+			byte[] bnFileDataLength = new byte[4];
+
+			//Read bytes from the bin file using binary reader and file stream
+			using (BinaryReader breader = new BinaryReader(new FileStream(filePath, FileMode.Open)))
+			{
+				//Read next 4 bytes (XX-XX-XX-XX) where XX-XX-XX-XX=Number of files in the bin
+				breader.BaseStream.Seek(8, SeekOrigin.Begin);
+				breader.Read(bnFileCount, 0, 4);
+				//Convert bytes to int
+				int ibnFileCount = BitConverter.ToInt32(bnFileCount);
+
+				//Some vars for the loop
+				int fileListOffset = 12;    //Offset where the header ends and the list of files starts
+				int getCurrentOffset = fileListOffset;
+				int fileNameLength = 0;
+				int fileDataLength = 0;
+
+				//Set progress bar max to the number of files in the bin
+				pbMain.Maximum = ibnFileCount;
+
+				//Loop to unpack each file
+				for (int i = 0; i < ibnFileCount; i++)
+				{
+					//Get file name length
+					breader.BaseStream.Seek(getCurrentOffset, SeekOrigin.Begin);
+					breader.Read(bnFileNameLength, 0, 4);
+					fileNameLength = BitConverter.ToInt32(bnFileNameLength);
+					getCurrentOffset += 4;  //Move offset to read from to start of file name
+
+					//Read file name and store it as a string
+					breader.BaseStream.Seek(getCurrentOffset, SeekOrigin.Begin);
+					Array.Resize(ref bnFileName, fileNameLength);   //Resize file name array to be the correct length of the file name
+					breader.Read(bnFileName, 0, fileNameLength);
+					string sbnFileName = Encoding.ASCII.GetString(bnFileName);
+					getCurrentOffset += fileNameLength;
+
+					//Get file data length
+					breader.BaseStream.Seek(getCurrentOffset, SeekOrigin.Begin);
+					breader.Read(bnFileDataLength, 0, 4);
+					fileDataLength = BitConverter.ToInt32(bnFileDataLength);
+					getCurrentOffset += (4 + fileDataLength);  //Move offset to read from to start of file data
+
+					//Update progress bar
+					pbMain.Value = i + 1;
+
+					//Update status textbox
+					txtStatus.Text = "Loading: " + sbnFileName + " (" + (i + 1) + "/" + ibnFileCount + ")";
+				}
+
+				//Clear out garbage to free up memory
+				GC.Collect();
+
+				tvBin.ExpandAll();
+
+				//Set progress bar back to 0
+				pbMain.Value = 0;
+
+				//Set status text to complete
+				txtStatus.Text = "BIN load complete!";
 			}
 		}
 
@@ -344,23 +432,27 @@ namespace jsb_binit
 		{
 			txtBINDirectory.Clear();
 			tvBin.Nodes.Clear();
-			btnLoad.Enabled = false;
-			btnCompile.Enabled = true;
-			compileToolStripMenuItem.Enabled = true;
+			btnDecompile.Enabled = false;
+			decompileToolStripMenuItem.Enabled = false;
 		}
 
 		private void LoadBIN(string s)
 		{
 			txtBINDirectory.Text = s;
 			tvBin.Nodes.Add(s);
-			btnLoad.Enabled = true;
-			btnCompile.Enabled = false;
-			compileToolStripMenuItem.Enabled = false;
+			btnDecompile.Enabled = true;
+			decompileToolStripMenuItem.Enabled = true;
+			GetBINFileNames(s);
 		}
 
-		private void btnLoad_Click(object sender, EventArgs e)
+		private void compileToolStripMenuItem_Click_1(object sender, EventArgs e)
 		{
-			
+			CompileDirectory();
+		}
+
+		private void decompileToolStripMenuItem_Click_1(object sender, EventArgs e)
+		{
+			DecompileBIN();
 		}
 	}
 }

@@ -186,13 +186,25 @@ namespace jsb_binit
 				breader.BaseStream.Seek(0, SeekOrigin.Begin);
 				breader.Read(bnHead, 0, 4);
 				//Convert bytes into string
-				string sbnHead = BitConverter.ToString(bnHead);
+				string sbnHead = Encoding.ASCII.GetString(bnHead);
+				//Check if the header is correct
+				if (sbnHead != "JSB>")
+				{
+					MessageBox.Show("ERROR: Invalid file header! Got: " + sbnHead + " , Expected: JSB>");
+					return;
+				}
 
 				//Read next 4 bytes (BNXX) where BN=Binary and XX=Binary version
 				breader.BaseStream.Seek(4, SeekOrigin.Begin);
 				breader.Read(bnVersion, 0, 4);
 				//Convert bytes to string
-				string sbnVersion = BitConverter.ToString(bnVersion);
+				string sbnVersion = Encoding.ASCII.GetString(bnVersion);
+				//Check if the filetype is correct
+				if (sbnVersion != "BN01")
+				{
+					MessageBox.Show("ERROR: Invalid file format! This program will only accept version 1 binary files at this time. Got: " + sbnVersion + " , Expected: BN01");
+					return;
+				}
 
 				//Read next 4 bytes (XX-XX-XX-XX) where XX-XX-XX-XX=Number of files in the bin
 				breader.BaseStream.Seek(8, SeekOrigin.Begin);

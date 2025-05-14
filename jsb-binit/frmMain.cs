@@ -8,47 +8,17 @@ namespace jsb_binit
 	public partial class frmMain : Form
 	{
 		DirectoryInfo inputDir = new DirectoryInfo(Properties.Settings.Default.InputDirectory);
-		String UserInputDir;
-		String UserOutputDir;
-		String decompDir = "D:\\Data\\binit\\bin\\";
-		String outputFileName = "binit.bin";
+		String UserInputDir = "C:\\";
+		String UserOutputDir = "C:\\";
+		String decompDir = "C:\\";
+		String outputFileName = "untitled.bin";
 
 		//Some vars
-		string fPath;
+		string fPath = "C:\\";
 
 		public frmMain()
 		{
 			InitializeComponent();
-		}
-
-		private void btnTest_Click(object sender, EventArgs e)
-		{
-			ClearTree();
-			//DisplayInputFiles();
-
-			for (int i = 0; i < 100; i++)
-			{
-				tvMain.Nodes.Add("Node" + i);
-			}
-		}
-
-		private void DisplayInputFiles()
-		{
-
-			foreach (FileInfo file in inputDir.GetFiles())
-			{
-				if (file.Exists)
-				{
-					tvMain.Nodes[0].Nodes.Add(file.Name);
-				}
-			}
-
-			tvMain.ExpandAll();
-		}
-
-		private void ClearTree()
-		{
-			tvMain.Nodes.Clear();
 		}
 
 		private void tvMain_AfterSelect(object sender, TreeViewEventArgs e)
@@ -56,16 +26,41 @@ namespace jsb_binit
 			//GetFileData(tvMain.SelectedNode);
 		}
 
-		private void GetFileData(TreeNode tn)
-		{
-			//byte[] currentFileData = File.ReadAllBytes(inputDir + "\\" + tn.Text);
-			//txtData.Text = Encoding.ASCII.GetString(currentFileData);
-		}
+		//--- BUTTONS ---
 
 		private void btnCompile_Click(object sender, EventArgs e)
 		{
 			CompileDirectory();
 		}
+
+		private void btnChangeInput_Click(object sender, EventArgs e)
+		{
+			ChangeInputDirectory();
+		}
+
+		private void btnUnload_Click(object sender, EventArgs e)
+		{
+			UnloadBIN();
+		}
+
+		//--- MENU BAR STUFF ---
+
+		private void compileToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			CompileDirectory();
+		}
+
+		private void decompileToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			DecompileBIN();
+		}
+
+		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Application.Exit();
+		}
+
+		//--- FUNCTIONS ---
 
 		private void CompileDirectory()
 		{
@@ -149,11 +144,15 @@ namespace jsb_binit
 			byte[] bnFileDataLength = new byte[4];
 			byte[] bnFileData = new byte[0];
 
-			using (var ofd = new OpenFileDialog())
+			//Get bin file path from the tree node
+			fPath = tvBin.Nodes[0].Text;
+
+			//Prompt user to select folder to dump bin contents
+			using (var fbd = new FolderBrowserDialog())
 			{
-				if (ofd.ShowDialog() == DialogResult.OK)
+				if (fbd.ShowDialog() == DialogResult.OK)
 				{
-					fPath = ofd.FileName;
+					decompDir = fbd.SelectedPath;
 				}
 				else
 				{
@@ -191,6 +190,8 @@ namespace jsb_binit
 				//Set progress bar max to the number of files in the bin
 				pbMain.Maximum = ibnFileCount;
 
+
+
 				//Loop to unpack each file
 				for (int i = 0; i < ibnFileCount; i++)
 				{
@@ -225,9 +226,6 @@ namespace jsb_binit
 						//Create data
 						fStream.Write(bnFileData, 0, fileDataLength);
 					}
-
-					//Add file to the treeview
-					tvBin.Nodes[0].Nodes.Add(sbnFileName);
 
 					//Update progress bar
 					pbMain.Value = i + 1;
@@ -272,11 +270,6 @@ namespace jsb_binit
 			DisplayInputFiles();
 		}
 
-		private void PopulateBINTree()
-		{
-			DecompileBIN();
-		}
-
 		private void frmMain_Load(object sender, EventArgs e)
 		{
 			InitDirectoryTree();
@@ -297,7 +290,7 @@ namespace jsb_binit
 
 		private void btnDecompile_Click(object sender, EventArgs e)
 		{
-			PopulateBINTree();
+			DecompileBIN();
 		}
 
 		private void chooseDirectoryToolStripMenuItem_Click(object sender, EventArgs e)
@@ -326,21 +319,6 @@ namespace jsb_binit
 			}
 		}
 
-		private void splitMain_Panel2_Paint(object sender, PaintEventArgs e)
-		{
-
-		}
-
-		private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
-		{
-
-		}
-
-		private void btnOpenExisting_Click(object sender, EventArgs e)
-		{
-
-		}
-
 		private void SetUserInputDirectory(string s)
 		{
 			Properties.Settings.Default.InputDirectory = s;
@@ -348,21 +326,25 @@ namespace jsb_binit
 			LoadUserSettings();
 		}
 
-		private void btnChangeInput_Click(object sender, EventArgs e)
+		private void DisplayInputFiles()
 		{
-			ChangeInputDirectory();
-		}
 
-		private void btnUnload_Click(object sender, EventArgs e)
-		{
-			UnloadBIN();
+			foreach (FileInfo file in inputDir.GetFiles())
+			{
+				if (file.Exists)
+				{
+					tvMain.Nodes[0].Nodes.Add(file.Name);
+				}
+			}
+
+			tvMain.ExpandAll();
 		}
 
 		private void UnloadBIN()
 		{
 			txtBINDirectory.Clear();
 			tvBin.Nodes.Clear();
-			btnUnload.Enabled = false;
+			btnLoad.Enabled = false;
 			btnCompile.Enabled = true;
 			compileToolStripMenuItem.Enabled = true;
 		}
@@ -371,21 +353,14 @@ namespace jsb_binit
 		{
 			txtBINDirectory.Text = s;
 			tvBin.Nodes.Add(s);
-			btnUnload.Enabled = true;
+			btnLoad.Enabled = true;
 			btnCompile.Enabled = false;
 			compileToolStripMenuItem.Enabled = false;
 		}
 
-		private void compileToolStripMenuItem_Click(object sender, EventArgs e)
+		private void btnLoad_Click(object sender, EventArgs e)
 		{
-			CompileDirectory();
-		}
-
-		private void decompileToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			PopulateBINTree();
+			
 		}
 	}
-
-
 }

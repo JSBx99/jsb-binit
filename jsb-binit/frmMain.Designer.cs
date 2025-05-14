@@ -48,13 +48,12 @@
 			txtInputDirectory = new TextBox();
 			tableLayoutPanel2 = new TableLayoutPanel();
 			tvBin = new TreeView();
-			btnUnload = new Button();
+			btnLoad = new Button();
 			txtBINDirectory = new TextBox();
 			btnCompile = new Button();
 			btnDecompile = new Button();
 			txtStatus = new TextBox();
 			pbMain = new ProgressBar();
-			btnTest = new Button();
 			msMain.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)splitMain).BeginInit();
 			splitMain.Panel1.SuspendLayout();
@@ -97,7 +96,6 @@
 			chooseOutputDirectoryToolStripMenuItem.Name = "chooseOutputDirectoryToolStripMenuItem";
 			chooseOutputDirectoryToolStripMenuItem.Size = new Size(279, 22);
 			chooseOutputDirectoryToolStripMenuItem.Text = "Change Output Directory";
-			chooseOutputDirectoryToolStripMenuItem.Visible = false;
 			// 
 			// toolStripMenuItem1
 			// 
@@ -110,14 +108,14 @@
 			compileToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.S;
 			compileToolStripMenuItem.Size = new Size(279, 22);
 			compileToolStripMenuItem.Text = "Compile BIN From Input Folder";
-			compileToolStripMenuItem.Click += compileToolStripMenuItem_Click;
+			compileToolStripMenuItem.Click += compileToolStripMenuItem_Click_1;
 			// 
 			// decompileToolStripMenuItem
 			// 
 			decompileToolStripMenuItem.Name = "decompileToolStripMenuItem";
 			decompileToolStripMenuItem.Size = new Size(279, 22);
 			decompileToolStripMenuItem.Text = "Unpack BIN To Folder...";
-			decompileToolStripMenuItem.Click += decompileToolStripMenuItem_Click;
+			decompileToolStripMenuItem.Click += decompileToolStripMenuItem_Click_1;
 			// 
 			// toolStripMenuItem2
 			// 
@@ -130,6 +128,7 @@
 			exitToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.F4;
 			exitToolStripMenuItem.Size = new Size(279, 22);
 			exitToolStripMenuItem.Text = "Exit";
+			exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
 			// 
 			// ofd
 			// 
@@ -152,8 +151,6 @@
 			splitMain.Panel2.Controls.Add(btnDecompile);
 			splitMain.Panel2.Controls.Add(txtStatus);
 			splitMain.Panel2.Controls.Add(pbMain);
-			splitMain.Panel2.Controls.Add(btnTest);
-			splitMain.Panel2.Paint += splitMain_Panel2_Paint;
 			splitMain.Size = new Size(824, 449);
 			splitMain.SplitterDistance = 719;
 			splitMain.TabIndex = 3;
@@ -229,7 +226,7 @@
 			tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70F));
 			tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
 			tableLayoutPanel2.Controls.Add(tvBin, 0, 0);
-			tableLayoutPanel2.Controls.Add(btnUnload, 1, 1);
+			tableLayoutPanel2.Controls.Add(btnLoad, 1, 1);
 			tableLayoutPanel2.Controls.Add(txtBINDirectory, 0, 1);
 			tableLayoutPanel2.Dock = DockStyle.Fill;
 			tableLayoutPanel2.Location = new Point(0, 0);
@@ -249,16 +246,16 @@
 			tvBin.Size = new Size(365, 409);
 			tvBin.TabIndex = 3;
 			// 
-			// btnUnload
+			// btnLoad
 			// 
-			btnUnload.Dock = DockStyle.Fill;
-			btnUnload.Location = new Point(262, 418);
-			btnUnload.Name = "btnUnload";
-			btnUnload.Size = new Size(106, 24);
-			btnUnload.TabIndex = 7;
-			btnUnload.Text = "Unload BIN";
-			btnUnload.UseVisualStyleBackColor = true;
-			btnUnload.Click += btnUnload_Click;
+			btnLoad.Dock = DockStyle.Fill;
+			btnLoad.Location = new Point(262, 418);
+			btnLoad.Name = "btnLoad";
+			btnLoad.Size = new Size(106, 24);
+			btnLoad.TabIndex = 7;
+			btnLoad.Text = "Load BIN";
+			btnLoad.UseVisualStyleBackColor = true;
+			btnLoad.Click += btnLoad_Click;
 			// 
 			// txtBINDirectory
 			// 
@@ -272,7 +269,7 @@
 			// btnCompile
 			// 
 			btnCompile.Dock = DockStyle.Bottom;
-			btnCompile.Location = new Point(0, 235);
+			btnCompile.Location = new Point(0, 279);
 			btnCompile.Name = "btnCompile";
 			btnCompile.Size = new Size(97, 60);
 			btnCompile.TabIndex = 2;
@@ -283,7 +280,7 @@
 			// btnDecompile
 			// 
 			btnDecompile.Dock = DockStyle.Bottom;
-			btnDecompile.Location = new Point(0, 295);
+			btnDecompile.Location = new Point(0, 339);
 			btnDecompile.Name = "btnDecompile";
 			btnDecompile.Size = new Size(97, 60);
 			btnDecompile.TabIndex = 4;
@@ -295,7 +292,7 @@
 			// 
 			txtStatus.Dock = DockStyle.Bottom;
 			txtStatus.Enabled = false;
-			txtStatus.Location = new Point(0, 355);
+			txtStatus.Location = new Point(0, 399);
 			txtStatus.Name = "txtStatus";
 			txtStatus.Size = new Size(97, 23);
 			txtStatus.TabIndex = 3;
@@ -303,22 +300,10 @@
 			// pbMain
 			// 
 			pbMain.Dock = DockStyle.Bottom;
-			pbMain.Location = new Point(0, 378);
+			pbMain.Location = new Point(0, 422);
 			pbMain.Name = "pbMain";
 			pbMain.Size = new Size(97, 23);
 			pbMain.TabIndex = 5;
-			// 
-			// btnTest
-			// 
-			btnTest.Dock = DockStyle.Bottom;
-			btnTest.Location = new Point(0, 401);
-			btnTest.Name = "btnTest";
-			btnTest.Size = new Size(97, 44);
-			btnTest.TabIndex = 0;
-			btnTest.Text = "Debug Button";
-			btnTest.UseVisualStyleBackColor = true;
-			btnTest.Visible = false;
-			btnTest.Click += btnTest_Click;
 			// 
 			// frmMain
 			// 
@@ -373,10 +358,9 @@
 		private TextBox txtBINDirectory;
 		private Button btnChangeInput;
 		private Button btnCompile;
-		private Button btnUnload;
+		private Button btnLoad;
 		private Button btnDecompile;
 		private TextBox txtStatus;
 		private ProgressBar pbMain;
-		private Button btnTest;
 	}
 }
